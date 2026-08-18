@@ -1,0 +1,151 @@
+# Link Robins Forage
+
+Hosted search for Flarum. Your posts are indexed on a search server of your own,
+and your forum's search box asks that server instead of the database. Searches
+come back faster, spelling mistakes still find things, and searching stops
+competing with everything else your database is doing.
+
+Flarum 2.x only.
+
+## Setting it up
+
+Install and enable the extension, then go to Admin, Extensions, Link Robins
+Forage, paste your setup key and save. That is the whole configuration: the
+endpoint, the keys and your plan's limit are fetched with the key, and your
+forum starts indexing itself straight away.
+
+A banner at the top of the settings page tells you where you stand:
+
+- **Connected**, with a count of how many posts are indexed
+- **Your search server is still being built**, which is normal for a minute or
+  two after subscribing. Press *Check again* rather than retyping the key.
+- **That key was not recognised**, which means the key is wrong or the
+  subscription has lapsed
+- **Cannot reach your search server**, which means everything is set up but the
+  server is not answering right now
+
+Two switches sit under the key, both on to begin with: *Show related discussions
+under each thread* and *Suggest similar discussions while someone writes*.
+
+A Forage subscription is what the setup key comes from:
+[linkrobins.com/forage](https://linkrobins.com/forage).
+
+## What it does
+
+**Search.** Anything typed into the forum's search box, and any API request with
+`filter[q]`, is answered by your search server. Browsing and filtering are not:
+Flarum only reaches for a search driver when there is a query, so tag pages,
+sorting and everything else still run against your database exactly as before.
+
+**Related discussions.** Under every discussion, a short list of others like it,
+built from the same index, with when each one was last posted in. *See more*
+opens the rest in a window without leaving the page. And while somebody is
+starting a new discussion, a few existing ones with similar titles appear under
+the title box as they type, so a question that has been asked before can be
+found before it is asked again.
+
+Both are suggestions and nothing more. Nobody is stopped from posting, the
+suggestions beside the composer go away on a click anywhere else or on the X and
+come back when the title changes, and when the search server has nothing to
+offer no panel appears at all. Each one has its own switch on the settings page,
+both on to begin with, so you can keep the list under a discussion and turn off
+the one beside the composer, or the other way round. Included on every plan.
+
+**Indexing.** Every post is kept in step automatically: written, edited, hidden,
+restored, approved, deleted. Renaming a discussion re-indexes its posts, because
+each post is indexed under its discussion's title. Hiding or deleting a
+discussion takes its posts out of the index.
+
+**Spelling.** A misspelled word still finds what you meant, as long as the word is
+long enough to tell a typo from a different word: five letters for one typo, nine
+for two. "rhubar" and "rhubrb" both find rhubarb. Short words are matched exactly,
+because at three letters almost every other short word is one typo away, and a
+search for "php" or "cat" that returned half the forum would be worse than useless.
+Typing the start of a word works at any length, so "bed" finds "beds".
+
+**Permissions.** Results are always filtered through Flarum's own visibility
+rules before they are shown. The search server has no idea who is asking, so
+everything it returns is treated as a suggestion and checked against what the
+person searching is allowed to read. A member cannot see a private discussion,
+a hidden post, or a post awaiting approval through search, whatever the search
+server says. Hidden and unapproved posts are never indexed at all. Posts in
+permission-restricted areas — a members-only or staff tag, say — are indexed,
+so that the people allowed to read them can search them; they live on your own
+dedicated search server, and your forum's permission rules decide who sees
+them in results, exactly as they decide who sees them anywhere else.
+
+**If the search server is unavailable**, searching falls back to the search
+Flarum ships with. Your search box keeps working; it is simply less good until
+the server is back. The same is true before you have entered a key at all.
+
+## What it does NOT do
+
+- It does not search users, tags, or anything but discussions and posts.
+- It does not block anyone from posting a duplicate. The similar-discussions
+  list beside the composer is advice, not a gate.
+- It does not change how results are displayed. Ranking comes from the search
+  server; the page is Flarum's.
+- It does not send anything to the search server except the post text, its id,
+  its discussion's id and title. No usernames, no email addresses, no IPs.
+- It does not index hidden or unapproved posts.
+
+## Rebuilding the index
+
+The index is filled automatically when you first connect, and kept up to date
+after that. Rebuild it by hand when you have imported posts straight into the
+database, when your queue was not running for a while, or if you just want to be
+sure:
+
+```
+php flarum forage:reindex
+```
+
+Add `--fresh` to empty the index first, which also clears out anything left over
+from posts that no longer exist.
+
+## Requirements
+
+- Flarum **2.0** or later
+- PHP **8.3+**
+- An active [Forage](https://linkrobins.com/forage) subscription
+- Outbound HTTPS from your forum's server
+- **A queue worker is strongly recommended.** Indexing runs as queued work. With
+  Flarum's default `sync` queue, that work happens during the web request that
+  triggered it, so posting a reply waits on your search server. With a real
+  queue driver it happens in the background, which is what you want.
+
+## Installation
+
+```sh
+composer require linkrobins/flarum-forage
+```
+
+Installing does not enable an extension: flip it on from your admin panel's
+Extensions page afterwards.
+
+## Updating
+
+```sh
+composer update linkrobins/flarum-forage
+php flarum cache:clear
+```
+
+## A note on how this hooks into Flarum
+
+Flarum 2.0 lets an extension register a whole new search driver, and that is the
+obvious-looking way to build this. It is not what happens here, on purpose.
+
+Filters, sorts and mutators are registered against a specific searcher class, so
+a driver that brings its own searchers silently loses every one of them that
+core and other extensions added. On a forum with Tags, `filter[tag]` would stop
+applying to searches, and the mutator that keeps restricted tags off the
+all-discussions list would stop running. So Forage replaces just the part that
+finds matches, and leaves the rest of Flarum's search pipeline in place. Every
+filter, sort and mutator any other extension has added keeps working.
+
+Indexing does use Flarum's own indexing system, which is driver-independent by
+design.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE).
