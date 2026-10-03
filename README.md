@@ -2,13 +2,17 @@
 
 > **Read-only archive of released versions of linkrobins/flarum-forage.** Not for installation: use [Packagist](https://packagist.org/packages/linkrobins/flarum-forage) or the [upstream repository](https://github.com/linkrobins/flarum-forage).
 
-**0** versions archived · Latest: [`v1.2.2`](https://github.com/flarchive/linkrobins-flarum-forage/tree/archive/v1.2.2) · License: `MIT` · Flarum: `^2.0`
+**5** versions archived · Latest: [`v1.2.2`](https://github.com/flarchive/linkrobins-flarum-forage/tree/archive/v1.2.2) · License: `MIT` · Flarum: `^2.0`
 
 ## Archived Versions
 
 | Version | Released | Flarum | Source |
 |---|---|---|---|
-| — | — | — | — |
+| `v1.0.0` | 2026-08-16 | `^2.0` | [Browse](https://github.com/flarchive/linkrobins-flarum-forage/tree/archive/v1.0.0) |
+| `v1.1.0` | 2026-08-16 | `^2.0` | [Browse](https://github.com/flarchive/linkrobins-flarum-forage/tree/archive/v1.1.0) |
+| `v1.2.0` | 2026-08-18 | `^2.0` | [Browse](https://github.com/flarchive/linkrobins-flarum-forage/tree/archive/v1.2.0) |
+| `v1.2.1` | 2026-08-19 | `^2.0` | [Browse](https://github.com/flarchive/linkrobins-flarum-forage/tree/archive/v1.2.1) |
+| `v1.2.2` | 2026-08-24 | `^2.0` | [Browse](https://github.com/flarchive/linkrobins-flarum-forage/tree/archive/v1.2.2) |
 
 Catalog entry: [packages/linkrobins-flarum-forage.json](https://github.com/flarchive/archive-index/blob/main/packages/linkrobins-flarum-forage.json)
 
